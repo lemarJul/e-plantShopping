@@ -8,8 +8,12 @@ function ProductList() {
   const dispatch = useDispatch();
   const [showCart, setShowCart] = useState(false);
   const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-  const [addedToCart, setAddedToCart] = useState({});
-
+  // const [addedToCart, setAddedToCart] = useState({});
+  const cart = useSelector((state) => state.cart);
+  const totalItems = cart.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
   const plantsArray = [
     {
       category: "Air Purifying Plants",
@@ -288,10 +292,10 @@ function ProductList() {
 
   const handleAddToCart = (product) => {
     dispatch(addItem(product));
-    setAddedToCart((prevState) => ({
-      ...prevState,
-      [product.name]: true,
-    }));
+    // setAddedToCart((prevState) => ({
+    //   ...prevState,
+    //   [product.name]: true,
+    // }));
   };
 
   return (
@@ -322,6 +326,7 @@ function ProductList() {
             {" "}
             <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
               <h1 className="cart">
+                <div className="cart_quantity_count">{totalItems}</div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 256 256"
@@ -351,8 +356,8 @@ function ProductList() {
         <div className="product-grid">
           {plantsArray.map((category, index) => (
             <div key={index}>
-              <h1>
-                <div>{category.category}</div>
+              <h1 className="plantname_heading">
+                <div className="plant_heading">{category.category}</div>
               </h1>
               <div className="product-list">
                 {category.plants.map((plant, plantIndex) => (
@@ -362,10 +367,16 @@ function ProductList() {
                       src={plant.image}
                       alt={plant.name}
                     />
+                    <div className="product-price">{plant.cost}</div>
                     <div className="product-title">{plant.name}</div>
                     {/*Similarly like the above plant.name show other details like description and cost*/}
                     <button
-                      className="product-button"
+                      className={`product-button ${
+                        // addedToCart[plant.name]
+                        cart.items.find((item) => item.name === plant.name)
+                          ? "added-to-cart"
+                          : ""
+                      }`}
                       onClick={() => handleAddToCart(plant)}
                     >
                       Add to Cart
